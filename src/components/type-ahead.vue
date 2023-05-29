@@ -45,7 +45,7 @@ export default defineComponent({
       if (timerId.value) clearTimeout(timerId.value);
       const debounceTime = 300;
 
-      timerId.value = setTimeout(() => {
+      timerId.value = window.setTimeout(() => {
         const searchTerm: string = e.target.value;
         emit("onSearch", searchTerm);
         clearTimeout(timerId.value);
