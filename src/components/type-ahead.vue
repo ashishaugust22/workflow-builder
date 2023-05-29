@@ -1,15 +1,22 @@
 <template>
   <div id="type-ahead">
     <label for="search-nodes">Search Node</label>
-    <input type="search" id="search-nodes" placeholder="Search Nodes" v-model="searchTerm">
-    <div class="type-ahead__suggestions" hidden>
+    <input 
+      type="search"
+      id="search-nodes"
+      placeholder="Search Nodes"
+      @focus="showSuggestion = true"
+      @input="onChangeDebounced($event)"
+    >
+    <div class="type-ahead__suggestions" v-if="nodes.length && showSuggestion">
       <ul>
-        <li>Test</li>
-        <li>Test</li>
-        <li>Test</li>
-        <li>Test</li>
-        <li>Test</li>
-        <li>Test</li>
+        <li
+          :value="node.id"
+          @click="onNodeClick(node.id)"
+          v-for="node of nodes"
+        >
+          {{ node.name }}
+        </li>
       </ul>
     </div>
   </div>
@@ -17,19 +24,48 @@
 
 <script lang="ts">
 import { defineComponent, ref, type Ref } from 'vue'
+import type { NodeType } from '../interfaces/node-type';
 
 export default defineComponent({
   name: 'TypeAhead',
+  emits: ['onSearch', 'addNode'],
+  props: {
+    nodes: {
+      type: Array<NodeType>,
+      default: []
+    }
+  },
   components: {
   },
-  methods: {},
-  setup() {
-    const searchTerm: Ref<string> = ref('');
+  setup(_, { emit }) {
+    const timerId: Ref<number> = ref(0);
+    const showSuggestion: Ref<Boolean> = ref(false);
+
+    function onChangeDebounced(e: any) {
+      if (timerId.value) clearTimeout(timerId.value);
+      const debounceTime = 300;
+
+      timerId.value = setTimeout(() => {
+        const searchTerm: string = e.target.value;
+        emit("onSearch", searchTerm);
+        clearTimeout(timerId.value);
+        showSuggestion.value = true;
+      }, debounceTime);
+    }
+
+    function onNodeClick(id: string) {
+      showSuggestion.value = false;
+      emit('addNode', id)
+    }
 
     return {
-      searchTerm
+      timerId,
+      onChangeDebounced,
+      onNodeClick,
+      showSuggestion
     }
-  }
+  },
+  methods: {},
 })
 </script>
 
@@ -65,7 +101,6 @@ export default defineComponent({
 
     ul {
       padding: 0;
-      box-shadow: 0 0 3px 5px #fff;
 
       li {
         background-color: var(--vt-c-black-mute);

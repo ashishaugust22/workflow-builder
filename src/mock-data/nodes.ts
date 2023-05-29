@@ -37,7 +37,7 @@ const data: CanvasNode[] = [
     height: 60,
     fill: getRandomColor(),
     isDragging: false
-  }),
+  })
   // new CanvasNode({
   //   x: 210 + 3 * GAP,
   //   y: 30,
@@ -54,7 +54,7 @@ export function getConnectorsData(nodes: CanvasNode[]) {
     let x1 = nodes[i].x + nodes[i].width
     let x2 = nodes[i + 1].x
     let y1 = nodes[i].y
-    let y2 = nodes[i + 1].y + nodes[i + 1].height/2
+    let y2 = nodes[i + 1].y + nodes[i + 1].height / 2
     connectorsData.push({ x1, x2, y1, y2 })
   }
   return connectorsData
@@ -65,4 +65,17 @@ function getRandomColor() {
   const g = Math.ceil(Math.random() * 255)
   const b = Math.ceil(Math.random() * 255)
   return `rgb(${r}, ${g}, ${b})`
+}
+
+export function createNextNode(nodes: CanvasNode[]) {
+  const numberOfNodes = nodes.length
+  const lastNode = nodes[numberOfNodes - 1]
+  return new CanvasNode({
+    x: lastNode.x + lastNode.width + GAP,
+    y: lastNode.y,
+    width: 60,
+    height: 60,
+    fill: getRandomColor(),
+    isDragging: false
+  })
 }

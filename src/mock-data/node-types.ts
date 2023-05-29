@@ -1,12 +1,13 @@
 import type { NodeType } from '../interfaces/node-type'
 import { v4 as uuid } from 'uuid'
 
-export function getNodeTypes(): Promise<NodeType[]> {
+export function getNodeTypes(searchTerm: string): Promise<NodeType[]> {
   return new Promise((resolve, _) => {
     const timeToResolve = Math.random() * 3
     setTimeout(() => {
       const clonedData = structuredClone(data)
-      resolve(structuredClone(clonedData))
+      const filteredData = clonedData.filter((node) => node.name.includes(searchTerm))
+      resolve(filteredData.length ? filteredData : clonedData)
     }, timeToResolve)
   })
 }

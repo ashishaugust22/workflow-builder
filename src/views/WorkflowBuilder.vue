@@ -1,7 +1,11 @@
 <template>
   <div id="workflow-builder">
     <h1>Workflow Builder</h1>
-    <TypeAhead />
+    <TypeAhead
+      :nodes="nodeTypes"
+      @onSearch="onSearch($event)"
+      @addNode="onAddNode($event)"
+    />
 
     <div class="legend" v-for="node of nodesData">
       <div class="legend-block" :style="{ backgroundColor: node.fill }"></div> ({{ node.x }}, {{ node.y }})
@@ -21,8 +25,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, type Ref } from 'vue'
-import { getConnectorsData, getNodes } from "../mock-data/nodes";
-import type { CanvasNode } from '../utils/node';
+import { createNextNode, getConnectorsData, getNodes } from "../mock-data/nodes";
+import { CanvasNode } from '../utils/node';
 import type { Connector } from '../interfaces/connector';
 import type { NodeType } from '../interfaces/node-type';
 import { getNodeTypes } from '../mock-data/node-types';
@@ -33,7 +37,6 @@ export default defineComponent({
   components: {
     TypeAhead
   },
-  methods: {},
   setup() {
     const offsetX: Ref<number> = ref(0);
     const offsetY: Ref<number> = ref(0);
@@ -45,8 +48,8 @@ export default defineComponent({
     const nodesData: Ref<CanvasNode[]> = ref([]);
     const nodeTypes: Ref<NodeType[]> = ref([]);
 
-    const canvasWidth: Ref<number> = ref(600);
-    const canvasHeight: Ref<number> = ref(600);
+    const canvasWidth: Ref<number> = ref(1200);
+    const canvasHeight: Ref<number> = ref(1200);
 
     const ctx: Ref<CanvasRenderingContext2D | any> = ref(0);
 
@@ -163,7 +166,6 @@ export default defineComponent({
       ctx.value.beginPath();
       ctx.value.moveTo(x1, y1);
       ctx.value.lineTo(x2, y2);
-      // ctx.value.bezierCurveTo(x1, y1, x2-x1, y2-y2 , x2, y2);
       ctx.value.lineWidth = 3;
       ctx.value.stroke();
 
@@ -192,7 +194,7 @@ export default defineComponent({
     onMounted(async () => {
       // get nodes data
       nodesData.value = await getNodes();
-      nodeTypes.value = await getNodeTypes();
+      nodeTypes.value = await getNodeTypes('');
 
       var canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
       ctx.value = canvas.getContext("2d");
@@ -209,6 +211,23 @@ export default defineComponent({
       canvasWidth,
       canvasHeight,
       nodesData,
+      nodeTypes,
+      draw
+    }
+  },
+  methods: {
+    onSearch(searchTerm: string) {
+      this.searchNodeTypes(searchTerm);
+    },
+    async searchNodeTypes(searchTerm: string) {
+      const res = await getNodeTypes(searchTerm);
+      this.nodeTypes = res;
+    },
+    onAddNode(nodeId: string){
+      const node = this.nodeTypes.filter(n=>n.id === nodeId);
+      const newNode = createNextNode(this.nodesData);
+      this.nodesData.push(newNode);
+      this.draw();
     }
   },
 })
