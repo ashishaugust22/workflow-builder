@@ -7,9 +7,12 @@
       @addNode="onAddNode($event)"
     />
 
-    <div class="legend" v-for="node of nodesData">
-      <div class="legend-block" :style="{ backgroundColor: node.fill }"></div> ({{ node.x }}, {{ node.y }})
+    <div class="legend">
+      <div class="legend-item" v-for="node of nodesData">
+        <div class="legend-item-icon" :style="{ backgroundColor: node.fill }"></div> ({{ node.x }}, {{ node.y }})
+      </div>
     </div>
+
     <div>
       <canvas 
         id="canvas" 
@@ -86,7 +89,7 @@ export default defineComponent({
     // handle mouse moves
     function mouseMove(e: MouseEvent) {
       // if we're dragging anything...
-      if (dragok) {
+      if (dragok.value) {
         // get the current mouse position
         var mx = parseInt((e.clientX - offsetX.value).toString());
         var my = parseInt((e.clientY - offsetY.value).toString());
@@ -113,7 +116,6 @@ export default defineComponent({
         // reset the starting mouse position for the next mousemove
         startX.value = mx;
         startY.value = my;
-
       }
     }
 
@@ -223,8 +225,8 @@ export default defineComponent({
       const res = await getNodeTypes(searchTerm);
       this.nodeTypes = res;
     },
-    onAddNode(nodeId: string){
-      const node = this.nodeTypes.filter(n=>n.id === nodeId);
+    onAddNode(nodeId: string) {
+      const node = this.nodeTypes.filter(n => n.id === nodeId);
       const newNode = createNextNode(this.nodesData);
       this.nodesData.push(newNode);
       this.draw();
@@ -241,14 +243,19 @@ export default defineComponent({
 
   .legend {
     display: flex;
-    align-items: center;
-    gap: 0.25rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
 
-    &-block {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border-radius: 0.25rem;
+      .legend-item-icon {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 0.25rem;
+      }
     }
   }
 }

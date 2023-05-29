@@ -4,7 +4,7 @@
     <input 
       type="search"
       id="search-nodes"
-      placeholder="Search Nodes"
+      placeholder="Add new node..."
       @focus="showSuggestion = true"
       @input="onChangeDebounced($event)"
     >
