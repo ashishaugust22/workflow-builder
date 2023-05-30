@@ -47,7 +47,7 @@ export default defineComponent({
     const startX: Ref<number> = ref(0);
     const startY: Ref<number> = ref(0);
 
-    const dragok: Ref<boolean> = ref(false);
+    const isDragging: Ref<boolean> = ref(false);
     const nodesData: Ref<CanvasNode[]> = ref([]);
     const nodeTypes: Ref<NodeType[]> = ref([]);
 
@@ -63,12 +63,12 @@ export default defineComponent({
       var my = parseInt((e.clientY - offsetY.value).toString());
 
       // test each rect to see if mouse is inside
-      dragok.value = false;
+      isDragging.value = false;
       for (var i = 0; i < nodesData.value.length; i++) {
         var r = nodesData.value[i];
         if (mx > r.x && mx < r.x + r.width && my > r.y && my < r.y + r.height) {
           // if yes, set that rects isDragging=true
-          dragok.value = true;
+          isDragging.value = true;
           r.isDragging = true;
         }
       }
@@ -80,7 +80,7 @@ export default defineComponent({
     // handle mouseup events
     function mouseUp(e: MouseEvent) {
       // clear all the dragging flags
-      dragok.value = false;
+      isDragging.value = false;
       for (var i = 0; i < nodesData.value.length; i++) {
         nodesData.value[i].isDragging = false;
       }
@@ -89,7 +89,7 @@ export default defineComponent({
     // handle mouse moves
     function mouseMove(e: MouseEvent) {
       // if we're dragging anything...
-      if (dragok.value) {
+      if (isDragging.value) {
         // get the current mouse position
         var mx = parseInt((e.clientX - offsetX.value).toString());
         var my = parseInt((e.clientY - offsetY.value).toString());
@@ -149,7 +149,7 @@ export default defineComponent({
     // draw a single rect
     function rect(x: number, y: number, w: number, h: number) {
       ctx.value.beginPath();
-      ctx.value.roundRect(x, y, w, h, [4, 4, 4, 4]);
+      ctx.value.rect(x, y, w, h, [4, 4, 4, 4]);
       ctx.value.closePath();
       ctx.value.fill();
     }
