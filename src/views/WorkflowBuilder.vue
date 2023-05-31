@@ -121,17 +121,19 @@ export default defineComponent({
 
     // redraw the scene
     function draw() {
-      clear();
-      ctx.value.fillStyle = "#FAF7F8";
-      rect(0, 0, canvasWidth.value, canvasHeight.value);
-      // redraw each rect in the rects[] array
-      for (var i = 0; i < nodesData.value.length; i++) {
-        var r = nodesData.value[i];
-        ctx.value.fillStyle = r.fill;
-        rect(r.x, r.y, r.width, r.height);
-      }
-
-      drawArrows();
+      requestAnimationFrame(()=>{
+        clear();
+        ctx.value.fillStyle = "#FAF7F8";
+        rect(0, 0, canvasWidth.value, canvasHeight.value);
+        // redraw each rect in the rects[] array
+        for (var i = 0; i < nodesData.value.length; i++) {
+          var r = nodesData.value[i];
+          ctx.value.fillStyle = r.fill;
+          rect(r.x, r.y, r.width, r.height);
+        }
+        
+        drawArrows();
+      })
     }
 
     function drawArrows() {
